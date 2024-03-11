@@ -502,6 +502,17 @@ if (isset($_POST['field'])) {
                     $error .= 'Router IP ('.htmlspecialchars($router).') is invalid!<br>';
                 }
 
+                // Validate DHCP DNS IP's
+                $dhcpdns = $_POST["dhcpdns"];
+                $dhcpdnsips=explode(",",$dhcpdns);
+                foreach ($dhcpdnsips as $dhcpdnsip) {
+                    if ($dhcpdnsip != "0.0.0.0") {
+                        if (!filter_var($dhcpdnsip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                                $error .= "DHCP DNS IP (".htmlspecialchars($dhcpdnsip).") is invalid!<br>";
+                        }
+                    }
+                }
+
                 $domain = $_POST['domain'];
 
                 // Validate Domain name
@@ -531,7 +542,7 @@ if (isset($_POST['field'])) {
                 }
 
                 if (!strlen($error)) {
-                    pihole_execute('-a enabledhcp '.$from.' '.$to.' '.$router.' '.$leasetime.' '.$domain.' '.$ipv6.' '.$rapidcommit);
+                    pihole_execute('-a enabledhcp '.$from.' '.$to.' '.$router.' '.$dhcpdns.' '.$leasetime.' '.$domain.' '.$ipv6.' '.$rapidcommit);
                     $success .= 'The DHCP server has been activated '.htmlspecialchars($type);
                 }
             } else {
